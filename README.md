@@ -1,7 +1,7 @@
 # SHBAAM
 [![License (3-Clause BSD)](https://img.shields.io/badge/license-BSD%203--Clause-yellow.svg)](https://github.com/c-h-david/shbaam/blob/master/LICENSE)
 
-[![Build Status](https://travis-ci.org/c-h-david/shbaam.svg?branch=master)](https://travis-ci.org/c-h-david/shbaam)
+[![Build Status](https://travis-ci.org/wytesk133/shbaam.svg?branch=master)](https://travis-ci.org/wytesk133/shbaam)
 
 Satellite Hydrology Bits Analysis And Mapping (SHBAAM) is a Python and bash 
 shell toolbox that combines many repetitive pre and post-processing tasks that 
