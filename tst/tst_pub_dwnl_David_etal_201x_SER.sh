@@ -121,6 +121,7 @@ done
 #-------------------------------------------------------------------------------
 cd $folder
 md5sum -c GRCTellus.JPL.200204_201608.GLO.RL05M_1.MSCNv02CRIv02.nc.md5
+if [ $? -gt 0 ] ; then echo "Problem Checking file" >&2 ; exit 44 ; fi
 cd -
 
 

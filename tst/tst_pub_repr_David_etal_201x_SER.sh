@@ -89,7 +89,7 @@ echo "- Terrestrial water storage anomalies"
      ../output/SERVIR_STK/timeseries_Nepal_tst.csv                             \
      ../output/SERVIR_STK/map_Nepal_tst.nc                                     \
      > $run_file
-x=$? && if [ $x -gt 0 ] ; then echo "Failed run: $run_file" >&2 ; exit $? ; fi
+x=$? && if [ $x -gt 0 ] ; then echo "Failed run: $run_file" >&2 ; exit $x ; fi
 
 echo "- Comparing timeseries"
 ./tst_cmp_csv.py                                                               \
