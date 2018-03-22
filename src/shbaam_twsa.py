@@ -336,7 +336,14 @@ for JS_grc_time in range(IS_grc_time):
 #*******************************************************************************
 print('Write shb_wsa_csv')
 
-with open(shb_wsa_csv, 'wb') as csvfile:
+if sys.version_info[0] < 3:
+  open_mode = 'wb'
+  open_newline = {}
+else:
+  open_mode = 'w'
+  open_newline = { 'newline':'' }
+
+with open(shb_wsa_csv, open_mode, **open_newline) as csvfile:
      #csvwriter = csv.writer(csvfile, dialect='excel', quotechar="'",           \
      #                       quoting=csv.QUOTE_NONNUMERIC)
      csvwriter = csv.writer(csvfile, dialect='excel')
@@ -386,7 +393,7 @@ vsn=vsn.rstrip()
 h.Conventions='CF-1.6'
 h.title=''
 h.institution=''
-h.source='SHBAAM: '+vsn+', GRACE: '+os.path.basename(shb_grc_ncf)             \
+h.source='SHBAAM: '+str(vsn)+', GRACE: '+os.path.basename(shb_grc_ncf)             \
                       +', Scale factors: '+os.path.basename(shb_fct_ncf)
 h.history='date created: '+dt.isoformat()+'+00:00'
 h.references='https://github.com/c-h-david/shbaam/'
