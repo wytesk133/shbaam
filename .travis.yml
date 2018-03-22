@@ -1,86 +1,62 @@
-#*******************************************************************************
-#.travis.yml
-#*******************************************************************************
-
-#Purpose:
-#Travis CI is a hosted continuous integration service, that is, it allows 
-#running code directly from a repository and checking that the code acts as 
-#expected. The purpose of the .travis.yml file is to give instructions to Travis 
-#CI on how to do the work.
-#Author:
-#Cedric H. David, 2017-2017
-
-
-#*******************************************************************************
-#System specifications for Travis CI
-#*******************************************************************************
-language: generic            #Language cannot yet be 'python' for OSX in Travis
+language: python
 
 matrix:
   include:
     - os: linux
+      dist: trusty
       sudo: required
+      python: "2.7"
+    - os: linux
+      dist: trusty
+      sudo: required
+      python: "3.4"
+    - os: linux
+      dist: trusty
+      sudo: required
+      python: "3.5"
+    - os: linux
+      dist: trusty
+      sudo: required
+      python: "3.6"
     - os: osx
-  allow_failures:
+      language: generic
+      env: PYTHON_VERSION=2.7.14
     - os: osx
+      language: generic
+      env: PYTHON_VERSION=3.4.8
+    - os: osx
+      language: generic
+      env: PYTHON_VERSION=3.5.5
+    - os: osx
+      language: generic
+      env: PYTHON_VERSION=3.6.4
 
-
-#*******************************************************************************
-#Environment variables for different tests on multiple Travis CI workers
-#*******************************************************************************
-env:
-- TST_PUB_DWNL='./tst_pub_dwnl_David_etal_201x_SER.sh' TST_PUB_REPR='./tst_pub_repr_David_etal_201x_SER.sh'
-
-
-#*******************************************************************************
-#Before installing SHBAAM
-#*******************************************************************************
 before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then apt-get --version                                        ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update                                      ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y $(grep -ve '^#' requirements.apt); fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew --version                                  ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update                                     ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew upgrade pyenv                              ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then which pyenv                                     ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv --version                                 ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then eval "$(pyenv init -)"                          ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv versions                                  ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv install -l                                ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv install $PYTHON_VERSION                   ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv global $PYTHON_VERSION                    ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pyenv versions                                  ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew cask uninstall oclint                      ; fi # see travis-ci/travis-ci#8826
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew reinstall $(grep -ve '^#' requirements.brw); fi
+  - which python
+  - python --version
+  - which pip
+  - pip --version
 
-#-------------------------------------------------------------------------------
-#Specific to Linux
-#-------------------------------------------------------------------------------
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then apt-get --version             ; fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y $(grep -v -E '(^#|^$)' requirements.apt) ; fi
-
-
-#-------------------------------------------------------------------------------
-#Specific to OSX
-#-------------------------------------------------------------------------------
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew --version                  ; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew tap homebrew/science       ; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew reinstall $(grep -v -E '(^#|^$)' requirements.brw) ; fi
-
-#-------------------------------------------------------------------------------
-#General environment details
-#-------------------------------------------------------------------------------
-- uname -a
-- echo $TRAVIS_OS_NAME
-- gcc --version
-- python --version
-- pip --version
-
-
-#*******************************************************************************
-#Installing SHBAAM
-#*******************************************************************************
 install:
-- cd $TRAVIS_BUILD_DIR
-- sudo pip install $(grep numpy requirements.pip)
-- sudo pip install -r requirements.pip
+  - pip install -r requirements.pip
 
-
-#*******************************************************************************
-#Testing SHBAAM
-#*******************************************************************************
 script:
-- cd $TRAVIS_BUILD_DIR
-- cd ./tst/
-- echo $TST_PUB_DWNL && $TST_PUB_DWNL
-- echo $TST_PUB_REPR && $TST_PUB_REPR
-- echo "The build is now completed"
-
-
-#*******************************************************************************
-#End
-#*******************************************************************************
+  - cd tst
+  - travis_wait 120 ./tst_pub_dwnl_David_etal_201x_SER.sh
+  - travis_wait 120 ./tst_pub_repr_David_etal_201x_SER.sh
