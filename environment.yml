@@ -1,0 +1,8 @@
+name: shbaam
+dependencies:
+  - python=2.7
+  - fiona
+  - netcdf4
+  - numpy
+  - rtree
+  - shapely
