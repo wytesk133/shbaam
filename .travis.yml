@@ -7,4 +7,4 @@ before_install:
   - docker build -t shbaam .
 
 script:
-  - docker run shbaam
+  - docker run shbaam /bin/bash -c "apt-get update && apt-get install -y wget unzip && cd tst && ./tst_pub_dwnl_David_etal_201x_SER.sh && ./tst_pub_repr_David_etal_201x_SER.sh"

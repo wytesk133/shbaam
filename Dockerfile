@@ -1,19 +1,14 @@
-FROM continuumio/miniconda
+FROM debian:stable-slim
 
-RUN apt-get install unzip
+COPY . ./shbaam
+WORKDIR /shbaam
 
-RUN useradd -ms /bin/bash wyte
-USER wyte
-WORKDIR /home/wyte
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends $(grep -ve '^#' requirements.apt) && \
+    rm -rf /var/lib/apt/lists/*
 
-COPY --chown=wyte:wyte . ./shbaam
-WORKDIR /home/wyte/shbaam
-COPY environment.yml .
+ADD https://bootstrap.pypa.io/get-pip.py .
+RUN python get-pip.py && \
+    rm get-pip.py
 
-RUN conda env create -f environment.yml
-SHELL ["/bin/bash", "-c"]
-
-CMD source activate shbaam && \
-    cd tst && \
-    ./tst_pub_dwnl_David_etal_201x_SER.sh && \
-    ./tst_pub_repr_David_etal_201x_SER.sh
+RUN pip install -r requirements.pip --no-cache-dir
