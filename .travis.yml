@@ -8,80 +8,53 @@
 #expected. The purpose of the .travis.yml file is to give instructions to Travis 
 #CI on how to do the work.
 #Author:
-#Cedric H. David, 2017-2018
+#Cedric H. David, and Wyte Krongapiradee, 2017-2018
 
 
 #*******************************************************************************
-#System specifications for Travis CI
+#Build Matrix
 #*******************************************************************************
 matrix:
   include:
     - os: linux
-      language: generic
+      dist: trusty
       sudo: required
+      language: generic
+      env: MINICONDA_INSTALLER=Miniconda2-latest-Linux-x86_64.sh
     - os: osx
       language: generic
-  allow_failures:
-    - os: osx
-
-
-#*******************************************************************************
-#Environment variables for different tests on multiple Travis CI workers
-#*******************************************************************************
-env:
-- TST_PUB_DWNL='./tst_pub_dwnl_David_etal_201x_SER.sh' TST_PUB_REPR='./tst_pub_repr_David_etal_201x_SER.sh'
+      env: MINICONDA_INSTALLER=Miniconda2-latest-MacOSX-x86_64.sh
 
 
 #*******************************************************************************
 #Before installing SHBAAM
 #*******************************************************************************
 before_install:
-
-#-------------------------------------------------------------------------------
-#Specific to Linux
-#-------------------------------------------------------------------------------
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then apt-get --version             ; fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y $(grep -v -E '(^#|^$)' requirements.apt) ; fi
-
-
-#-------------------------------------------------------------------------------
-#Specific to OSX
-#-------------------------------------------------------------------------------
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew --version                  ; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rm /usr/local/include/c++ ; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew reinstall $(grep -v -E '(^#|^$)' requirements.brw) ; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ln -s /usr/local/bin/python2 /usr/local/bin/python ; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ln -s /usr/local/bin/pip2 /usr/local/bin/pip ; fi
-
-#-------------------------------------------------------------------------------
-#General environment details
-#-------------------------------------------------------------------------------
-- uname -a
-- echo $TRAVIS_OS_NAME
-- which python
-- python --version
-- ls -l $(which python)
-- ls -l $(which -a python)
-- which pip
-- pip --version
-- ls -l $(which pip)
-- ls -l $(which -a pip)
+  - wget https://repo.continuum.io/miniconda/$MINICONDA_INSTALLER -O miniconda.sh
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  - conda info -a
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install md5sha1sum; fi
 
 
 #*******************************************************************************
 #Installing SHBAAM
 #*******************************************************************************
 install:
-- sudo pip install -r requirements.pip
+  - conda env create -f environment.yml
+  - source activate shbaam
 
 
 #*******************************************************************************
 #Testing SHBAAM
 #*******************************************************************************
 script:
-- cd ./tst/
-- echo $TST_PUB_DWNL && $TST_PUB_DWNL
-- echo $TST_PUB_REPR && $TST_PUB_REPR
+  - cd tst
+  - ./tst_pub_dwnl_David_etal_201x_SER.sh
+  - ./tst_pub_repr_David_etal_201x_SER.sh
 
 
 #*******************************************************************************
