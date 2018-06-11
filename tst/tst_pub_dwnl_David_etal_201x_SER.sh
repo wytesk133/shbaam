@@ -199,6 +199,9 @@ if [ $? -gt 0 ] ; then echo "Problem converting" >&2 ; exit 22 ; fi
 #*******************************************************************************
 #Download LDAS data from GES-DISC
 #*******************************************************************************
+echo "machine $NETRC_MACHINE"  >> ~/.netrc
+echo "login $NETRC_LOGIN"    >> ~/.netrc
+echo "password $NETRC_PASSWORD" >> ~/.netrc
 ../src/shbaam_ldas.py VIC 2000-01-01T00:00:00 2000-06-01T00:00:00 ../input/GLDAS/
 x=$? && if [ $x -gt 0 ] ; then echo "Problem downloading LDAS data from GES-DISC" >&2 ; exit $x ; fi
 
