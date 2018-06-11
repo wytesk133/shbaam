@@ -8,7 +8,7 @@
 #The purpose of the .appveyor.yml file is to give instructions to AppVeyor on
 #how to do the work.
 #Author:
-#Cedric H. David, and Jiayou Shi, 2018-2018
+#Cedric H. David, Jiayou Shi, and Wyte Krongapiradee, 2018-2018
 
 
 #*******************************************************************************
@@ -35,28 +35,25 @@ environment:
 #Before installing SHBAAM
 #*******************************************************************************
 install:
-  - ps: rm Alias:wget
-  - ps: choco install --no-progress ((gc requirements.cho) -notmatch '^#' -match '\S')
-  - ps: $ENV:PATH="C:\\ProgramData\\MiniConda2;C:\\ProgramData\\MiniConda2\\Scripts;$ENV:PATH"
-  - ps: $ENV:PATH="C:\\Program Files (x86)\\GnuWin32\\bin;$ENV:PATH"
+  - set PATH=C:\Miniconda-x64;C:\Miniconda-x64\Scripts;C:\cygwin64\bin;%PATH%
+  - C:\cygwin64\setup-x86_64.exe --quiet-mode --no-shortcuts --upgrade-also --packages unzip
 
 
 #*******************************************************************************
 #Installing SHBAAM
 #*******************************************************************************
 build_script:
-  - ps: conda install -y -q -c anaconda --file requirements.cnd
+  - conda env create -f environment.yml
+  - activate shbaam
 
 
 #*******************************************************************************
 #Testing SHBAAM
 #*******************************************************************************
 test_script:
-  - ps: cd tst
-  - ps: Write-Host $env:TST_PUB_DWNL
-  - ps: bash $env:TST_PUB_DWNL
-  - ps: Write-Host $env:TST_PUB_REPR
-  - ps: bash $env:TST_PUB_REPR
+  - cd tst
+  - bash %TST_PUB_DWNL%
+  - bash %TST_PUB_REPR%
 
 
 #*******************************************************************************
