@@ -54,7 +54,7 @@ print('- '+rrr_lsm_dir)
 
 
 #*******************************************************************************
-#Check if directory exists 
+#Check if directory exists
 #*******************************************************************************
 rrr_lsm_dir=os.path.join(rrr_lsm_dir,'')
 #add trailing slash if it is not there
@@ -172,11 +172,13 @@ r=requests.get(url, params=payload, auth=cred)
 #     &VARIABLES=SoilM1,SWE
 #requests.get() actually downloads the file into memory and also saves some
 #associated download metadata
-if r.ok:
-     print('- The request was successful')
-else:
-     print('ERROR - Status code '+str(r.status_code))
-     raise SystemExit(22)
+if not r.ok:
+    print('ERROR - Status code {}'.format(r.status_code))
+    raise SystemExit(22)
+if r.headers['Content-Type'] != 'application/octet-stream':
+    print('ERROR - Unexpected MIME type: ' + r.headers['Content-Type'])
+    raise SystemExit(22)
+print('- The request was successful')
 
 
 #*******************************************************************************
@@ -192,7 +194,7 @@ print('- Creating a networking session and assigning associated credentials')
 s=requests.Session()
 s.auth=cred
 
-     
+
 #-------------------------------------------------------------------------------
 #If requesting monthly data
 #-------------------------------------------------------------------------------
@@ -255,9 +257,12 @@ for JS_count in range(IS_count):
           print(' . Downloading '+payload['LABEL'])
           r=s.get(url, params=payload)
           if not r.ok:
-               print('ERROR - status code '+str(r.status_code)+                \
-                     'returned when downloading '+payload['FILENAME'])
-               raise SystemExit(22)
+              print('ERROR - status code {} returned when downloading {}' \
+                    .format(r.status_code, payload['FILENAME']))
+              raise SystemExit(22)
+          if r.headers['Content-Type'] != 'application/octet-stream':
+              print('ERROR - Unexpected MIME type: ' + r.headers['Content-Type'])
+              raise SystemExit(22)
           YS_name=r.headers['content-disposition']
           YS_name=YS_name.replace('attachment; filename=','')
           YS_name=YS_name.replace('"','')
@@ -268,7 +273,7 @@ for JS_count in range(IS_count):
      #Increment current datetime
      # - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + - + -
      rrr_dat_cur=(rrr_dat_cur+datetime.timedelta(days=32)).replace(day=1)
-     
+
 #-------------------------------------------------------------------------------
 #Closing the networking session
 #-------------------------------------------------------------------------------
