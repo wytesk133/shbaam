@@ -8,7 +8,7 @@
 #downloads LDAS data from GES-DISC using the NASA EarthData credentials stored
 #locally in '~/.netrc' file.
 #Author:
-#Cedric H. David, 2018-2018
+#Cedric H. David, and Wyte Krongapiradee, 2018-2018
 
 
 #*******************************************************************************
@@ -35,7 +35,7 @@ import requests
 IS_arg=len(sys.argv)
 if IS_arg != 5:
      print('ERROR - 4 and only 4 arguments can be used')
-     raise SystemExit(22) 
+     raise SystemExit(22)
 
 rrr_lsm_mod=sys.argv[1]
 rrr_iso_beg=sys.argv[2]
@@ -73,7 +73,7 @@ if rrr_lsm_mod=='VIC' or rrr_lsm_mod=='NOAH' or rrr_lsm_mod=='MOS'             \
      print('- Model name is valid')
 else:
      print('ERROR - Invalid model name')
-     raise SystemExit(22) 
+     raise SystemExit(22)
 
 
 #*******************************************************************************
@@ -88,7 +88,7 @@ if rrr_dat_end>=rrr_dat_beg:
      print('- Beginning of interval is before end of interval')
 else:
      print('ERROR - Beginning of interval is NOT before end of interval')
-     raise SystemExit(22) 
+     raise SystemExit(22)
 
 rrr_dat_stp=rrr_dat_beg
 IS_count=0
@@ -103,7 +103,7 @@ if rrr_dat_beg.day==1 and rrr_dat_beg.hour==0 and                              \
 else:
      print('ERROR - The interval does NOT start at the top of a month: '       \
            +rrr_iso_beg)
-     raise SystemExit(22) 
+     raise SystemExit(22)
 
 while rrr_dat_stp<=rrr_dat_end:
      rrr_dat_stp=(rrr_dat_stp+datetime.timedelta(days=32)).replace(day=1)
@@ -120,8 +120,12 @@ print('Obtaining credentials for the server from a local file')
 url='https://urs.earthdata.nasa.gov'
 print('- '+url)
 
-cred=requests.utils.get_netrc_auth(url)
-print('- The credentials were obtained from ~/.netrc file')
+cred=requests.utils.get_netrc_auth(url, raise_errors=True)
+if cred is not None:
+    print('- The credentials were obtained from ~/.netrc file')
+else:
+    print('ERROR - Unable to obtain credentials from ~/.netrc file')
+    raise SystemExit(22)
 
 
 #*******************************************************************************
